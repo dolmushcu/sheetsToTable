@@ -91,6 +91,20 @@
         opacity: 0;
       }
     }
+
+    .error {
+      position: fixed;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      font-size: 17px;
+      color: rgb(219, 0, 0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -109,6 +123,8 @@
     <div></div>
   </div>
 
+  <div class="error"></div>
+
   <table id="table" class="display" width="100%"></table>
   
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -126,7 +142,7 @@
         execute();
       },
       onerror: function (err) {
-        console.error('gapi.client failed to load!', err);
+        showErr('gapi.client failed to load!', err);
       }
     });
     
@@ -134,7 +150,7 @@
       gapi.client.setApiKey("AIzaSyCaiUFAPEX7T7KeKIWIYLznKyq2W9_V8Fc");
       return gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4")
         .then(function () { console.log("GAPI client loaded for API"); },
-          function (err) { console.error("Error loading GAPI client for API", err); });
+          function (err) { showErr("Error loading GAPI client for API", err); });
     }
     // Make sure the client is loaded before calling this method.
     async function execute() {
@@ -148,7 +164,7 @@
           console.log("Response", response.result.values);
           buildTable(response.result.values);
         },
-          function (err) { console.error("Execute error", err); });
+          function (err) { showErr("Execute error", err); });
     }
     
     function buildTable(dataSet) {
@@ -166,6 +182,13 @@
       });
 
       document.querySelector(".lds-spinner").style.display = "none";
+    }
+
+    function showErr(message, err) {
+      console.error(err);
+      document.querySelector(".lds-spinner").style.display = "none";
+      document.querySelector(".error").style.display = "flex";
+      document.querySelector(".error").innerHTML = "ERROR";
     }
     
   </script>
