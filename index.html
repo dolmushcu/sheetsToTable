@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google sheets to table</title>
+  
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+</head>
+<body>
+  <table id="table" class="display" width="100%"></table>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  
+  <script>
+    /**
+     * Sample JavaScript code for sheets.spreadsheets.values.get
+     * See instructions for running APIs Explorer code samples locally:
+     * https://developers.google.com/explorer-help/guides/code_samples#javascript
+     */
+    gapi.load("client", {
+      callback: function() {
+        execute();
+      },
+      onerror: function (err) {
+        console.error('gapi.client failed to load!', err);
+      }
+    });
+    
+    function loadClient() {
+      gapi.client.setApiKey("AIzaSyCaiUFAPEX7T7KeKIWIYLznKyq2W9_V8Fc");
+      return gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4")
+        .then(function () { console.log("GAPI client loaded for API"); },
+          function (err) { console.error("Error loading GAPI client for API", err); });
+    }
+    // Make sure the client is loaded before calling this method.
+    async function execute() {
+      await loadClient();
+      return gapi.client.sheets.spreadsheets.values.get({
+        "spreadsheetId": "1_cWt4Xcrl1KarJLKB1w4zqw-tTIxHs7xMQk5nYXn8ZM",
+        "range": "A1:Z2000"
+      })
+        .then(function (response) {
+          // Handle the results here (response.result has the parsed body).
+          console.log("Response", response.result.values);
+          buildTable(response.result.values);
+        },
+          function (err) { console.error("Execute error", err); });
+    }
+    
+
+    function buildTable(dataSet) {
+      let titles = [];
+
+      for (let i = 0; i < dataSet[0].length; i++) {
+        titles[i] = { title: dataSet[0][i] };
+      }
+
+      new DataTable("#table", {
+        data: dataSet.slice(1),
+        columns: titles,
+        paging: false,
+        scrollX: true
+      });
+    }
+    
+  </script>
+</body>
+</html>
